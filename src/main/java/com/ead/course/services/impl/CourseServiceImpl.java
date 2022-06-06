@@ -12,15 +12,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import com.ead.course.clients.AuthUserClient;
 import com.ead.course.models.CourseModel;
-import com.ead.course.models.CourseUserModel;
 import com.ead.course.models.LessonModel;
 import com.ead.course.models.ModuleModel;
 import com.ead.course.repositories.CourseRepository;
-import com.ead.course.repositories.CourseUserRepository;
 import com.ead.course.repositories.LessonRepository;
 import com.ead.course.repositories.ModuleRepository;
+import com.ead.course.repositories.UserRepository;
 import com.ead.course.services.CourseService;
 
 @Service
@@ -36,16 +34,12 @@ public class CourseServiceImpl implements CourseService {
 	LessonRepository lessonRepository;
 	
 	@Autowired
-	CourseUserRepository courseUserRepository;
-	
-	@Autowired
-	AuthUserClient authUserClient;
+	UserRepository userRepository;
 
 	//Este tipo de deleção em cascata, além de conferir uma melhor performance, nos dá um controle melhor sobre as transações.
 	@Transactional
 	@Override
 	public void delete(CourseModel courseModel) {
-		var deleteCourseUserInAuthUser = false;
 		List<ModuleModel> moduleModelList = moduleRepository.findAllModulesIntoCourse(courseModel.getCourseId());
 		if(!moduleModelList.isEmpty()) {
 			for(ModuleModel module : moduleModelList) {
@@ -56,15 +50,9 @@ public class CourseServiceImpl implements CourseService {
 			}
 			moduleRepository.deleteAll(moduleModelList);
 		}
-		List<CourseUserModel> courseUserModelList = courseUserRepository.findAllCourseUserIntoCourse(courseModel.getCourseId());
-		if(!courseUserModelList.isEmpty()) {
-			courseUserRepository.deleteAll(courseUserModelList);
-			deleteCourseUserInAuthUser = true;
-		}
+		
 		courseRepository.delete(courseModel);
-		if(deleteCourseUserInAuthUser) {
-			authUserClient.deleteCourseInAuthUser(courseModel.getCourseId());
-		}
+	
 	}
 
 	@Override
