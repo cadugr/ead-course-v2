@@ -9,5 +9,6 @@ import com.ead.course.models.UserModel;
 public interface UserService {
 
 	Page<UserModel> findAll(Specification<UserModel> spec, Pageable pageable);
+	UserModel save(UserModel userModel);
 
 }

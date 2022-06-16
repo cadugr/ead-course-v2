@@ -31,7 +31,7 @@ public class UserModel implements Serializable {
 	
 	@Id
 	//Não precisamos gerar o id, pois ele será passado pelo microservice de authuser por meio de state transfer
-	private UUID id;
+	private UUID userId;
 	@Column(nullable = false, unique = true, length = 50)
 	private String email;
 	@Column(nullable = false, length = 150)
